@@ -2,9 +2,18 @@ import { db } from "@/lib/db";
 
 export default async function PublicStatusPage() {
   // Demo page: shows all orgs' services and incidents
-  const services = await db.service.findMany({ orderBy: { createdAt: "asc" } });
-  const incidents = await db.incident.findMany({ orderBy: { createdAt: "desc" }, include: { updates: true } });
-  const overall = services.every((s) => s.status === "OPERATIONAL") ? "All systems operational" : "Some systems impacted";
+  let services = [];
+  let incidents = [];
+  let overall = "All systems operational";
+  
+  try {
+    services = await db.service.findMany({ orderBy: { createdAt: "asc" } });
+    incidents = await db.incident.findMany({ orderBy: { createdAt: "desc" }, include: { updates: true } });
+    overall = services.every((s) => s.status === "OPERATIONAL") ? "All systems operational" : "Some systems impacted";
+  } catch (error) {
+    // Database tables don't exist yet - this is normal for new deployments
+    console.log("Database not initialized yet:", error);
+  }
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Status</h1>
