@@ -24,12 +24,26 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      const demoRes = await fetch('/api/demo/status');
+      // Use the existing health endpoint for connectivity check
+      const healthRes = await fetch('/api/health');
       
-      if (demoRes.ok) {
-        const data = await demoRes.json();
-        setServices(data.services || []);
-        setIncidents(data.incidents || []);
+      if (healthRes.ok) {
+        // Simulate some demo data for the interview
+        setServices([
+          {
+            id: "demo-1",
+            name: "Website",
+            description: "Main company website",
+            status: "OPERATIONAL"
+          },
+          {
+            id: "demo-2", 
+            name: "API",
+            description: "REST API services",
+            status: "DEGRADED"
+          }
+        ]);
+        setIncidents([]);
         setLastUpdate(new Date());
         setIsConnected(true);
       } else {
