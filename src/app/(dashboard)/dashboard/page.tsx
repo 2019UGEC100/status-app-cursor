@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { pusherClient } from "@/lib/pusher-client";
+import { createPusherClient } from "@/lib/pusher-client";
 
 interface Service {
   id: string;
@@ -33,10 +33,12 @@ export default function DashboardPage() {
   ]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [lastUpdate, setLastUpdate] = useState<string>("");
 
   useEffect(() => {
     // Initialize Pusher connection
+    const pusherClient = createPusherClient();
+    
     if (pusherClient) {
       const channel = pusherClient.subscribe('status-updates');
       
@@ -48,7 +50,7 @@ export default function DashboardPage() {
             service.id === data.service.id ? data.service : service
           )
         );
-        setLastUpdate(new Date());
+        setLastUpdate(new Date().toLocaleTimeString());
       });
 
       // Listen for incident updates
@@ -59,20 +61,21 @@ export default function DashboardPage() {
             incident.id === data.incident.id ? data.incident : incident
           )
         );
-        setLastUpdate(new Date());
+        setLastUpdate(new Date().toLocaleTimeString());
       });
 
       // Listen for new incidents
       channel.bind('incident-created', (data: { incident: Incident }) => {
         console.log('🆕 New incident created:', data);
         setIncidents(prev => [data.incident, ...prev]);
-        setLastUpdate(new Date());
+        setLastUpdate(new Date().toLocaleTimeString());
       });
 
       // Connection status
       pusherClient.connection.bind('connected', () => {
         console.log('✅ Pusher connected');
         setIsConnected(true);
+        setLastUpdate(new Date().toLocaleTimeString());
       });
 
       pusherClient.connection.bind('disconnected', () => {
@@ -101,7 +104,7 @@ export default function DashboardPage() {
               : service
           )
         );
-        setLastUpdate(new Date());
+        setLastUpdate(new Date().toLocaleTimeString());
         console.log(`🔄 Demo: ${randomService.name} status changed to ${newStatus}`);
       }
     }, 10000); // Every 10 seconds
@@ -128,7 +131,7 @@ export default function DashboardPage() {
             <span>{isConnected ? 'WebSocket Connected' : 'WebSocket Disconnected'}</span>
           </div>
           <span className="text-sm text-gray-500">
-            Last update: {lastUpdate.toLocaleTimeString()}
+            Last update: {lastUpdate || 'Initializing...'}
           </span>
         </div>
       </div>
