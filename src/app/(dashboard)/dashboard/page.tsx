@@ -24,18 +24,12 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      const [servicesRes, incidentsRes, healthRes] = await Promise.all([
-        fetch('/api/services'),
-        fetch('/api/incidents'),
-        fetch('/api/health')
-      ]);
+      const demoRes = await fetch('/api/demo/status');
       
-      if (servicesRes.ok && incidentsRes.ok && healthRes.ok) {
-        const servicesData = await servicesRes.json();
-        const incidentsData = await incidentsRes.json();
-        const healthData = await healthRes.json();
-        setServices(servicesData);
-        setIncidents(incidentsData);
+      if (demoRes.ok) {
+        const data = await demoRes.json();
+        setServices(data.services || []);
+        setIncidents(data.incidents || []);
         setLastUpdate(new Date());
         setIsConnected(true);
       } else {
