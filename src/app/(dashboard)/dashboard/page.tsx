@@ -24,6 +24,7 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
+      console.log('🔄 Fetching data from /api/health...');
       // Add cache-busting parameter to force fresh request
       const timestamp = Date.now();
       const healthRes = await fetch(`/api/health?t=${timestamp}`, {
@@ -34,7 +35,10 @@ export default function DashboardPage() {
         }
       });
       
+      console.log('📡 Health response status:', healthRes.status);
+      
       if (healthRes.ok) {
+        console.log('✅ Health check successful - setting connected state');
         // Simulate some demo data for the interview
         setServices([
           {
@@ -54,16 +58,18 @@ export default function DashboardPage() {
         setLastUpdate(new Date());
         setIsConnected(true);
       } else {
-        console.error('Health check failed with status:', healthRes.status);
+        console.error('❌ Health check failed with status:', healthRes.status);
         setIsConnected(false);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('💥 Failed to fetch data:', error);
       setIsConnected(false);
     }
   };
 
   useEffect(() => {
+    console.log('🚀 Dashboard component mounted - starting data fetching');
+    
     // Initial fetch
     fetchData();
     
@@ -74,6 +80,7 @@ export default function DashboardPage() {
     const forceRefresh = setTimeout(fetchData, 2000);
     
     return () => {
+      console.log('🛑 Dashboard component unmounting - cleaning up intervals');
       clearInterval(interval);
       clearTimeout(forceRefresh);
     };
