@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "@clerk/nextjs/server";
-import { db } from "@/lib/db";
 import Link from "next/link";
 
 interface Service {
