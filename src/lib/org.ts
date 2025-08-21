@@ -1,4 +1,4 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
 export async function ensureOrganizationExists() {
@@ -7,14 +7,13 @@ export async function ensureOrganizationExists() {
 
   try {
     const name = "Organization";
-    const slug = null as string | null;
 
     await db.organization.upsert({
       where: { id: orgId },
-      create: { id: orgId, name, slug: undefined },
-      update: { name, slug: undefined },
+      create: { id: orgId, name },
+      update: { name },
     });
-  } catch (_err) {
+  } catch {
     // Fallback: ensure row exists with minimal data
     await db.organization.upsert({
       where: { id: orgId },
