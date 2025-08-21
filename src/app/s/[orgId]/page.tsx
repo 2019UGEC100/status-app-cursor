@@ -1,9 +1,10 @@
 import { db } from "@/lib/db";
+import type { Service, Incident } from "@/generated/prisma";
 
 export default async function OrgStatusPage({ params }: { params: Promise<{ orgId: string }> }) {
   const { orgId } = await params;
-  let services = [];
-  let incidents = [];
+  let services: Service[] = [];
+  let incidents: (Incident & { updates: any[] })[] = [];
   let overall = "All systems operational";
   
   try {

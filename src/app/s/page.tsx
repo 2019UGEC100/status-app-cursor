@@ -1,9 +1,10 @@
 import { db } from "@/lib/db";
+import type { Service, Incident } from "@/generated/prisma";
 
 export default async function PublicStatusPage() {
   // Demo page: shows all orgs' services and incidents
-  let services = [];
-  let incidents = [];
+  let services: Service[] = [];
+  let incidents: (Incident & { updates: any[] })[] = [];
   let overall = "All systems operational";
   
   try {
