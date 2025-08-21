@@ -24,8 +24,15 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      // Use the existing health endpoint for connectivity check
-      const healthRes = await fetch('/api/health');
+      // Add cache-busting parameter to force fresh request
+      const timestamp = Date.now();
+      const healthRes = await fetch(`/api/health?t=${timestamp}`, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       
       if (healthRes.ok) {
         // Simulate some demo data for the interview
@@ -47,6 +54,7 @@ export default function DashboardPage() {
         setLastUpdate(new Date());
         setIsConnected(true);
       } else {
+        console.error('Health check failed with status:', healthRes.status);
         setIsConnected(false);
       }
     } catch (error) {
@@ -56,33 +64,46 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    // Initial fetch
     fetchData();
     
     // Real-time updates every 5 seconds
     const interval = setInterval(fetchData, 5000);
     
-    return () => clearInterval(interval);
+    // Force a refresh after 2 seconds to ensure we get fresh data
+    const forceRefresh = setTimeout(fetchData, 2000);
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(forceRefresh);
+    };
   }, []);
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <div className="flex items-center space-x-4">
-          <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
-            isConnected 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-          }`}>
-            <div className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-green-500' : 'bg-red-500'
-            }`}></div>
-            <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
-          </div>
-          <span className="text-sm text-gray-500">
-            Last update: {lastUpdate.toLocaleTimeString()}
-          </span>
-        </div>
+                          <div className="flex items-center space-x-4">
+                    <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+                      isConnected 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        isConnected ? 'bg-green-500' : 'bg-red-500'
+                      }`}></div>
+                      <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      Last update: {lastUpdate.toLocaleTimeString()}
+                    </span>
+                    <button 
+                      onClick={fetchData}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                    >
+                      Refresh
+                    </button>
+                  </div>
       </div>
 
       <div className="flex space-x-4 text-sm">
