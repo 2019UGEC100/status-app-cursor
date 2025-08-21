@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 interface Service {
   id: string;
@@ -17,15 +16,27 @@ interface Incident {
 }
 
 export default function DashboardPage() {
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<Service[]>([
+    {
+      id: "demo-1",
+      name: "Website",
+      description: "Main company website",
+      status: "OPERATIONAL"
+    },
+    {
+      id: "demo-2", 
+      name: "API",
+      description: "REST API services",
+      status: "DEGRADED"
+    }
+  ]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
 
-  const fetchData = async () => {
+  const checkConnection = async () => {
     try {
-      console.log('🔄 Fetching data from /api/health...');
-      // Add cache-busting parameter to force fresh request
+      console.log('🔄 Checking connection to /api/health...');
       const timestamp = Date.now();
       const healthRes = await fetch(`/api/health?t=${timestamp}`, {
         method: 'GET',
@@ -38,51 +49,35 @@ export default function DashboardPage() {
       console.log('📡 Health response status:', healthRes.status);
       
       if (healthRes.ok) {
-        console.log('✅ Health check successful - setting connected state');
-        // Simulate some demo data for the interview
-        setServices([
-          {
-            id: "demo-1",
-            name: "Website",
-            description: "Main company website",
-            status: "OPERATIONAL"
-          },
-          {
-            id: "demo-2", 
-            name: "API",
-            description: "REST API services",
-            status: "DEGRADED"
-          }
-        ]);
-        setIncidents([]);
+        console.log('✅ Connection successful - backend is healthy');
         setLastUpdate(new Date());
         setIsConnected(true);
       } else {
-        console.error('❌ Health check failed with status:', healthRes.status);
+        console.error('❌ Connection failed with status:', healthRes.status);
         setIsConnected(false);
       }
     } catch (error) {
-      console.error('💥 Failed to fetch data:', error);
+      console.error('💥 Connection check failed:', error);
       setIsConnected(false);
     }
   };
 
   useEffect(() => {
-    console.log('🚀 Dashboard component mounted - starting data fetching');
+    console.log('🚀 Dashboard mounted - starting connection monitoring');
     
-    // Initial fetch
-    fetchData();
+    // Initial connection check
+    checkConnection();
     
-    // Real-time updates every 5 seconds
-    const interval = setInterval(fetchData, 5000);
+    // Check connection every 5 seconds
+    const interval = setInterval(checkConnection, 5000);
     
-    // Force a refresh after 2 seconds to ensure we get fresh data
-    const forceRefresh = setTimeout(fetchData, 2000);
+    // Force a check after 2 seconds
+    const forceCheck = setTimeout(checkConnection, 2000);
     
     return () => {
-      console.log('🛑 Dashboard component unmounting - cleaning up intervals');
+      console.log('🛑 Dashboard unmounting - cleaning up');
       clearInterval(interval);
-      clearTimeout(forceRefresh);
+      clearTimeout(forceCheck);
     };
   }, []);
 
@@ -90,39 +85,35 @@ export default function DashboardPage() {
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-                          <div className="flex items-center space-x-4">
-                    <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
-                      isConnected 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      <div className={`w-2 h-2 rounded-full ${
-                        isConnected ? 'bg-green-500' : 'bg-red-500'
-                      }`}></div>
-                      <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      Last update: {lastUpdate.toLocaleTimeString()}
-                    </span>
-                    <button 
-                      onClick={fetchData}
-                      className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-                    >
-                      Refresh
-                    </button>
-                  </div>
+        <div className="flex items-center space-x-4">
+          <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+            isConnected 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-red-100 text-red-800'
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${
+              isConnected ? 'bg-green-500' : 'bg-red-500'
+            }`}></div>
+            <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
+          </div>
+          <span className="text-sm text-gray-500">
+            Last update: {lastUpdate.toLocaleTimeString()}
+          </span>
+          <button 
+            onClick={checkConnection}
+            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+          >
+            Test Connection
+          </button>
+        </div>
       </div>
 
-      <div className="flex space-x-4 text-sm">
-        <Link href="/dashboard/services" className="text-blue-600 hover:underline">
-          Services
-        </Link>
-        <Link href="/dashboard/incidents" className="text-blue-600 hover:underline">
-          Incidents
-        </Link>
-        <Link href="/s" className="text-blue-600 hover:underline">
-          Public Page
-        </Link>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 className="font-semibold text-blue-800 mb-2">Demo Mode</h3>
+        <p className="text-blue-700 text-sm">
+          This is a demo dashboard showing real-time backend connectivity. 
+          The connection indicator shows if the backend API is responding.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -147,34 +138,30 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
-            {services.length === 0 && (
-              <p className="text-gray-500">No services yet.</p>
-            )}
           </div>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold mb-4">Recent Incidents</h2>
           <div className="space-y-3">
-            {incidents.map((incident) => (
-              <div key={incident.id} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium">{incident.title}</h3>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    incident.status === 'RESOLVED' ? 'bg-green-100 text-green-800' :
-                    incident.status === 'MONITORING' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {incident.status}
-                  </span>
-                </div>
-              </div>
-            ))}
             {incidents.length === 0 && (
-              <p className="text-gray-500">No incidents yet.</p>
+              <div className="text-center py-8">
+                <p className="text-gray-500">No incidents reported</p>
+                <p className="text-sm text-gray-400 mt-1">All systems operational</p>
+              </div>
             )}
           </div>
         </section>
+      </div>
+
+      <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+        <h3 className="font-semibold mb-2">Interview Demo Instructions:</h3>
+        <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+          <li>Click "Test Connection" to manually verify backend connectivity</li>
+          <li>Watch the green "Connected" indicator show real-time status</li>
+          <li>Use browser dev tools to block network requests and show disconnection</li>
+          <li>Unblock to demonstrate reconnection capability</li>
+        </ol>
       </div>
     </div>
   );
