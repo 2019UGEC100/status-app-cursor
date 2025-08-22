@@ -17,7 +17,7 @@ export default function Home() {
       // Redirect to dashboard (this is a demo - in real app would use proper auth)
       window.location.href = "/dashboard";
     } else {
-      alert("Invalid credentials. Use: admin@statuspage.com / admin123");
+      alert("Invalid credentials. Please try again.");
     }
     setIsLoading(false);
   };
@@ -41,7 +41,7 @@ export default function Home() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@statuspage.com"
+                  placeholder="Enter your email"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -54,7 +54,7 @@ export default function Home() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="admin123"
+                  placeholder="Enter your password"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -67,11 +67,6 @@ export default function Home() {
                 {isLoading ? "Signing In..." : "Sign In as Admin"}
               </button>
             </form>
-            <div className="mt-3 text-xs text-gray-600">
-              <strong>Demo Credentials:</strong><br/>
-              Email: admin@statuspage.com<br/>
-              Password: admin123
-            </div>
           </div>
 
           {/* Public Access */}
