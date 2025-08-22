@@ -11,7 +11,7 @@ export default function Home() {
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Simple admin check - in production this would be server-side
     if (email === "admin@statuspage.com" && password === "admin123") {
       // Redirect to dashboard (this is a demo - in real app would use proper auth)
@@ -27,7 +27,7 @@ export default function Home() {
       <div className="max-w-3xl mx-auto py-16">
         <h1 className="text-4xl font-semibold">StatusPage</h1>
         <p className="text-gray-600 mt-2">Manage your services and incidents with live updates.</p>
-        
+
         <div className="mt-8 space-y-6">
           {/* Admin Login Form */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -73,22 +73,22 @@ export default function Home() {
               Password: admin123
             </div>
           </div>
-          
+
           {/* Public Access */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
             <h2 className="font-semibold text-gray-800 mb-4">Public Access</h2>
             <p className="text-gray-700 text-sm mb-4">
               View the public status page (no authentication required).
             </p>
-            <Link 
-              href="/s" 
+            <Link
+              href="/s"
               className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 inline-block"
             >
               View Public Status
             </Link>
           </div>
         </div>
-        
+
         <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
           <h3 className="font-semibold text-green-800 mb-3">Features</h3>
           <ul className="text-green-700 text-sm space-y-1 list-disc list-inside">
